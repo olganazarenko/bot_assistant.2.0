@@ -31,18 +31,12 @@ class Record(Field):
     def change_phone(self, old_phone, new_phone):
         for phone in self.phones:
             if phone.value == old_phone:
-                self.phones.append(Phone(new_phone))
+                self.add_phone(new_phone)
                 self.phones.remove(phone)
                 return True
-            else:
-                print('The phone number not exist')
-                return False
 
     def delete_phone(self, new_phone):
         for phone in self.phones:
             if phone.value == new_phone:
                 self.phones.remove(phone)
                 return True
-            else:
-                print('The phone number not exist')
-                return False

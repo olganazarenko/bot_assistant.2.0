@@ -1,9 +1,8 @@
-from clases import *
+from classes import AddressBook, Record
 
 
-def add_new_contact():
-    name = input('Enter name:\n')
-    phone = input('Enter phone number:\n')
+def add_new_contact(name, phone):
+
     if len(phone.split()) > 1:
         print('Enter ONE phone number')
     else:
@@ -17,9 +16,8 @@ def add_new_contact():
             print('Enter correct name and phone.')
 
 
-def add_new_phone():
-    name = input('Enter name:\n')
-    phone = input('Enter phone number:\n')
+def add_new_phone(name, phone):
+
     try:
         record_add_phone = addressbook.data[name]
         record_add_phone.add_phone(phone)
@@ -28,21 +26,22 @@ def add_new_phone():
         print('Enter correct name.')
 
 
-def change_phone():
-    name = input('Enter name:\n')
-    phone = input('Enter phone number:\n')
-    new_phone = input('Enter new phone number:\n')
+def change_phone(name, phone, new_phone):
+
     try:
         record_change = addressbook.data[name]
         if record_change.change_phone(old_phone=phone, new_phone=new_phone) is True:
             print(
                 f'A contact name: {name} number: {phone}, has been changed to {new_phone}.')
+        else:
+            print('The phone number not exist')
+
     except KeyError:
         print('Enter correct name.')
 
 
-def get_contact_number():
-    name = input('Enter name:\n')
+def get_contact_number(name):
+
     try:
         print('name:', addressbook.data[name].name.value, 'phone:',
               list(map(lambda x: x.value, addressbook.data[name].phones)))
@@ -63,33 +62,35 @@ def show_all_func():
     print(f'All contacts:\n{addressbook.data}')
 
 
-def delete_func():
-    name = input('Enter name:\n')
-    phone = input('Enter phone number:\n')
+def delete_func(name, phone):
+
     try:
         record_delete = addressbook.data[name]
 
         if record_delete.delete_phone(phone) is True:
             print(f'Contact name: {name} phone: {phone}, has been deleted.')
 
+        else:
+            print('The phone number not exist')
+
     except KeyError:
         print('Enter correct name.')
 
 
 COMMANDS = {
-    'add contact': add_new_contact,
-    'add phone': add_new_phone,
+    'add': add_new_contact,
+    'add_phone': add_new_phone,
     'change': change_phone,
     'phone': get_contact_number,
     'hello': hello_func,
-    'show all': show_all_func,
-    'good bye': quit_func,
+    'show_all': show_all_func,
+    'good_bye': quit_func,
     'close': quit_func,
     'exit': quit_func,
     'delete': delete_func
 }
-commands = ['add contact', 'add phone', 'change', 'phone',
-            'hello', 'show all', 'good bye', 'close', 'exit', 'delete']
+commands = ['add', 'add_phone', 'change', 'phone',
+            'hello', 'show_all', 'good_bye', 'close', 'exit', 'delete']
 
 
 def main():
@@ -106,11 +107,22 @@ def main():
             print(f"All commands: {commands}.")
             continue
 
-        if user_input.split()[0] in COMMANDS:
-            COMMANDS[user_input.split()[0]]()
-
-        elif user_input in COMMANDS:
+        if user_input in COMMANDS:
             COMMANDS[user_input]()
+
+        elif user_input.split()[0] in COMMANDS:
+
+            try:
+                COMMANDS[user_input.split()[0]](
+                    user_input.split()[1])
+            except:
+
+                try:
+                    COMMANDS[user_input.split()[0]](
+                        user_input.split()[1], user_input.split()[2])
+                except:
+                    COMMANDS[user_input.split()[0]](
+                        user_input.split()[1], user_input.split()[2], user_input.split()[3])
 
         else:
             print(
