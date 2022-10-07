@@ -24,7 +24,7 @@ def add_new_contact(data):
     record_add = Record(name.lower())
     record_add.add_phone(phone)
     addressbook.add_record(record_add)
-    print(f'A new contact name: {name} phone: {phone}, has been added.')
+    return f'A new contact name: {name} phone: {phone}, has been added.'
 
 
 @input_error
@@ -32,7 +32,7 @@ def add_new_phone(data):
     name, phone = create_data(data)
     record_add_phone = addressbook.data[name]
     record_add_phone.add_phone(phone)
-    print(f'A new phone: {phone}, has been added to contact name: {name}.')
+    return f'A new phone: {phone}, has been added to contact name: {name}.'
 
 
 @input_error
@@ -42,33 +42,30 @@ def change_phone(data):
 
     record_change = addressbook.data[name]
     if record_change.change_phone(old_phone=phone, new_phone=new_phone) is True:
-        print(
-            f'A contact name: {name} number: {phone}, has been changed to {new_phone}.')
+        return f'A contact name: {name} number: {phone}, has been changed to {new_phone}.'
     else:
-        print('The phone number not exist')
+        return 'The phone number not exist'
 
 
 @input_error
 def get_contact_number(name):
     name = name[0]
-    print('name:', addressbook.data[name].name.value, 'phone:',
-          list(map(lambda x: x.value, addressbook.data[name].phones)))
+    return f"'name:' {addressbook.data[name].name.value}, 'phone:'{list(map(lambda x: x.value, addressbook.data[name].phones))}"
 
 
 @input_error
 def quit_func():
-    print('Good bye!')
-    quit()
+    return 'Good bye!'
 
 
 @input_error
 def hello_func():
-    print("Hello! How can I help you?")
+    return "Hello! How can I help you?"
 
 
 @input_error
 def show_all_func():
-    print(f'All contacts:\n{addressbook.data}')
+    return f'All contacts:\n{addressbook.data}'
 
 
 @input_error
@@ -77,10 +74,10 @@ def delete_func(data):
     record_delete = addressbook.data[name]
 
     if record_delete.delete_phone(phone) is True:
-        print(f'Contact name: {name} phone: {phone}, has been deleted.')
+        return f'Contact name: {name} phone: {phone}, has been deleted.'
 
     else:
-        print('The phone number not exist')
+        return 'The phone number not exist'
 
 
 COMMANDS = {
@@ -128,10 +125,12 @@ def main():
             continue
 
         elif user_input in COMMANDS:
-            COMMANDS[user_input]()
+            print(COMMANDS[user_input]())
+            if COMMANDS[user_input]() == "Good bye!":
+                break
 
         elif user_input.split()[0] in COMMANDS:
-            COMMANDS[user_input.split()[0]](user_input.split()[1:])
+            print(COMMANDS[user_input.split()[0]](user_input.split()[1:]))
 
         else:
             print(
