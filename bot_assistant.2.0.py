@@ -108,7 +108,10 @@ def main():
             continue
 
         if user_input in COMMANDS:
-            COMMANDS[user_input]()
+            try:
+                COMMANDS[user_input]()
+            except:
+                print('Enter correct command.')
 
         elif user_input.split()[0] in COMMANDS:
 
