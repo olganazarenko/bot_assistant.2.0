@@ -1,80 +1,86 @@
 from classes import AddressBook, Record
 
 
-def add_new_contact(name, phone):
+def input_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+            return result
+        except KeyError:
+            print('Enter user name.')
+        except ValueError:
+            print('Enter correct type.')
+        except IndexError:
+            print('Give me name and phone please.')
+        except TypeError:
+            print('Give me name and phone please.')
 
-    if len(phone.split()) > 1:
-        print('Enter ONE phone number')
+    return wrapper
+
+
+@input_error
+def add_new_contact(data):
+    name, phone = create_data(data)
+    record_add = Record(name.lower())
+    record_add.add_phone(phone)
+    addressbook.add_record(record_add)
+    print(f'A new contact name: {name} phone: {phone}, has been added.')
+
+
+@input_error
+def add_new_phone(data):
+    name, phone = create_data(data)
+    record_add_phone = addressbook.data[name]
+    record_add_phone.add_phone(phone)
+    print(f'A new phone: {phone}, has been added to contact name: {name}.')
+
+
+@input_error
+def change_phone(data):
+    name, phone = create_data(data)
+    new_phone = data[2]
+
+    record_change = addressbook.data[name]
+    if record_change.change_phone(old_phone=phone, new_phone=new_phone) is True:
+        print(
+            f'A contact name: {name} number: {phone}, has been changed to {new_phone}.')
     else:
-        if name and phone:
-            record_add = Record(name.lower())
-            record_add.add_phone(phone)
-            addressbook.add_record(record_add)
-            print(
-                f'A new contact name: {name} phone: {phone}, has been added.')
-        else:
-            print('Enter correct name and phone.')
+        print('The phone number not exist')
 
 
-def add_new_phone(name, phone):
-
-    try:
-        record_add_phone = addressbook.data[name]
-        record_add_phone.add_phone(phone)
-        print(f'A new phone: {phone}, has been added to contact name: {name}.')
-    except KeyError:
-        print('Enter correct name.')
-
-
-def change_phone(name, phone, new_phone):
-
-    try:
-        record_change = addressbook.data[name]
-        if record_change.change_phone(old_phone=phone, new_phone=new_phone) is True:
-            print(
-                f'A contact name: {name} number: {phone}, has been changed to {new_phone}.')
-        else:
-            print('The phone number not exist')
-
-    except KeyError:
-        print('Enter correct name.')
-
-
+@input_error
 def get_contact_number(name):
-
-    try:
-        print('name:', addressbook.data[name].name.value, 'phone:',
-              list(map(lambda x: x.value, addressbook.data[name].phones)))
-    except KeyError:
-        print('Enter correct name.')
+    name = name[0]
+    print('name:', addressbook.data[name].name.value, 'phone:',
+          list(map(lambda x: x.value, addressbook.data[name].phones)))
 
 
+@input_error
 def quit_func():
     print('Good bye!')
     quit()
 
 
+@input_error
 def hello_func():
     print("Hello! How can I help you?")
 
 
+@input_error
 def show_all_func():
     print(f'All contacts:\n{addressbook.data}')
 
 
-def delete_func(name, phone):
+@input_error
+def delete_func(data):
+    name, phone = create_data(data)
+    record_delete = addressbook.data[name]
 
-    try:
-        record_delete = addressbook.data[name]
+    if record_delete.delete_phone(phone) is True:
+        print(f'Contact name: {name} phone: {phone}, has been deleted.')
 
-        if record_delete.delete_phone(phone) is True:
-            print(f'Contact name: {name} phone: {phone}, has been deleted.')
-
-        else:
-            print('The phone number not exist')
-
-    except KeyError:
-        print('Enter correct name.')
+    else:
+        print('The phone number not exist')
 
 
 COMMANDS = {
@@ -83,14 +89,24 @@ COMMANDS = {
     'change': change_phone,
     'phone': get_contact_number,
     'hello': hello_func,
-    'show_all': show_all_func,
-    'good_bye': quit_func,
+    'show all': show_all_func,
+    'good bye': quit_func,
     'close': quit_func,
     'exit': quit_func,
     'delete': delete_func
 }
 commands = ['add', 'add_phone', 'change', 'phone',
-            'hello', 'show_all', 'good_bye', 'close', 'exit', 'delete']
+            'hello', 'show all', 'good bye', 'close', 'exit', 'delete']
+
+
+def create_data(data):
+    name = data[0]
+    phone = data[1]
+    if name.isnumeric():
+        raise ValueError('Wrong name.')
+    if not phone.isnumeric():
+        raise ValueError('Wrong phone.')
+    return name, phone
 
 
 def main():
@@ -100,32 +116,22 @@ def main():
     while True:
 
         user_input = input('Enter command:\n').lower()
+
         if user_input == '.':
             break
 
-        if user_input == 'help':
+        elif user_input == 'help':
             print(f"All commands: {commands}.")
             continue
 
-        if user_input in COMMANDS:
-            try:
-                COMMANDS[user_input]()
-            except:
-                print('Enter correct command.')
+        elif user_input == "":
+            continue
+
+        elif user_input in COMMANDS:
+            COMMANDS[user_input]()
 
         elif user_input.split()[0] in COMMANDS:
-
-            try:
-                COMMANDS[user_input.split()[0]](
-                    user_input.split()[1])
-            except:
-
-                try:
-                    COMMANDS[user_input.split()[0]](
-                        user_input.split()[1], user_input.split()[2])
-                except:
-                    COMMANDS[user_input.split()[0]](
-                        user_input.split()[1], user_input.split()[2], user_input.split()[3])
+            COMMANDS[user_input.split()[0]](user_input.split()[1:])
 
         else:
             print(
