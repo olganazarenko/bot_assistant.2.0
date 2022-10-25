@@ -1,5 +1,3 @@
-from collections import UserDict
-
 
 class Field:
     def __init__(self, name):
